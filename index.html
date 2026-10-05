@@ -363,6 +363,17 @@ button,input,select{touch-action:manipulation}
   .app{max-width:100%;padding:8px}
 }
 
+
+/* Mobile: prevent rapid +/- taps from being interpreted as double-tap zoom.
+   Keep normal page scrolling and pinch zoom available. */
+.controls button,
+#modalMinus,
+#modalPlus,
+.deck-slot,
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 </style>
 </head>
 <body>
@@ -1165,7 +1176,12 @@ function renderCards(){
   });
 }
 
-function render(){renderDeck();renderStatus();renderCards()}
+function render(){
+  $("titleLabel").textContent=`タイトル：${title}`;
+  renderDeck();
+  renderStatus();
+  renderCards();
+}
 
 function openModal(cid){
   modalCardId=cid;
