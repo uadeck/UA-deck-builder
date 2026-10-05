@@ -383,6 +383,11 @@ button {
 .controls button{
   touch-action: manipulation;
 }
+
+.controls button[aria-disabled="true"]{
+  opacity:.42;
+  cursor:default;
+}
 </style>
 </head>
 <body>
@@ -605,6 +610,7 @@ const cgh1PendingEnergy=[{"id":"UA01BT/CGH-1-001","name":"扇 要","title":"コ�
 // CGH-1 metadata is verified; energy remains pending verification, so these are not enabled yet.
 const LEGACY_STORAGE_KEY="uaDeckPrototypeV2";
 const STORAGE_KEY="uaDeckLibraryV1";
+const EDITOR_SESSION_KEY="uaDeckEditorSessionV1";
 let currentDeckId=null;
 let selectedLibraryDeckId=null;
 let deckLibraryScrollY=0;
@@ -980,11 +986,12 @@ function updateCardListQty(cid){
     const minus=item.querySelector(".minus");
     const plus=item.querySelector(".plus");
     if(qty)qty.textContent=qtyOf(cid);
-    if(minus)minus.disabled=qtyOf(cid)<=0;
-    if(plus)plus.disabled=!c||!canAdd(c);
+    if(minus)minus.setAttribute("aria-disabled",qtyOf(cid)<=0?"true":"false");
+    if(plus)plus.setAttribute("aria-disabled",(!c||!canAdd(c))?"true":"false");
   });
 }
 function renderAfterQtyChange(cid){
+  persistEditorSession();
   renderDeck();
   renderStatus();
   updateCardListQty(cid);
@@ -1008,6 +1015,7 @@ function removeCard(cid){
 function moveCard(from,to){
   if(from===null||to===null||from===to||from<0||to<0||from>=deck.length||to>=deck.length)return;
   [deck[from],deck[to]]=[deck[to],deck[from]];
+  persistEditorSession();
   renderDeck();
   renderStatus();
 }
@@ -1198,24 +1206,25 @@ function renderCards(){
     item.innerHTML=`
       <img class="card-img" referrerpolicy="no-referrer" src="${c.image}" alt="">
       <div class="controls">
-        <button class="minus" ${qtyOf(c.id)>0?"":"disabled"}>−</button>
+        <button class="minus" aria-disabled="${qtyOf(c.id)>0?"false":"true"}">−</button>
         <div class="qty">${qtyOf(c.id)}</div>
-        <button class="plus" ${canAdd(c)?"":"disabled"}>＋</button>
+        <button class="plus" aria-disabled="${canAdd(c)?"false":"true"}">＋</button>
       </div>`;
     item.querySelector(".card-img").addEventListener("click",()=>openModal(c.id));
 
     const minusBtn=item.querySelector(".minus");
     const plusBtn=item.querySelector(".plus");
     const fastPress=(btn,action)=>{
+      const run=()=>{if(btn.getAttribute("aria-disabled")!=="true")action()};
       btn.addEventListener("pointerdown",e=>{
         if(e.pointerType==="touch"){
           e.preventDefault();
-          action();
+          run();
         }
       });
       btn.addEventListener("click",e=>{
         // Touch already fired on pointerdown; keep click for mouse/keyboard.
-        if(e.detail===0 || !("PointerEvent" in window) || e.pointerType==="mouse") action();
+        if(e.detail===0 || !("PointerEvent" in window) || e.pointerType==="mouse") run();
       });
     };
     fastPress(minusBtn,()=>removeCard(c.id));
@@ -1306,6 +1315,38 @@ function openCoverPicker(afterPick){
   }
   $("coverBackdrop").classList.add("show");
 }
+function persistEditorSession(){
+  if(!currentDeckId)return;
+  try{
+    sessionStorage.setItem(EDITOR_SESSION_KEY,JSON.stringify({
+      currentDeckId,
+      title,
+      name:$("deckName").value||"新しいデッキ",
+      cards:[...deck]
+    }));
+  }catch(e){}
+}
+function clearEditorSession(){
+  try{sessionStorage.removeItem(EDITOR_SESSION_KEY)}catch(e){}
+}
+function restoreEditorSession(){
+  try{
+    const raw=sessionStorage.getItem(EDITOR_SESSION_KEY);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    if(!data||!data.currentDeckId||!data.title||!Array.isArray(data.cards))return false;
+    if(!TITLES.some(t=>t.id===data.title&&t.enabled))return false;
+    currentDeckId=data.currentDeckId;
+    title=data.title;
+    deck=data.cards.filter(cid=>cards.some(c=>c.id===cid&&c.title===title));
+    $("deckName").value=data.name||"新しいデッキ";
+    showEditor();
+    return true;
+  }catch(e){
+    clearEditorSession();
+    return false;
+  }
+}
 function saveDeck(){
   const errors=getDeckValidationErrors();
   if(errors.length){
@@ -1329,6 +1370,7 @@ function resetCardFilters(){
   listSortState.mode="energy";listSortState.dir=1;updateSortButtons();
 }
 function showHome(){
+  clearEditorSession();
   resetCardFilters();
   const cardListWrap=document.querySelector(".card-list-wrap");
   if(cardListWrap){
@@ -1340,6 +1382,7 @@ function showHome(){
   $("editorView").classList.add("view-hidden");$("homeView").classList.remove("view-hidden");renderLibrary();
 }
 function showEditor(){
+  persistEditorSession();
   $("deckListView").style.display="none";
   $("homeView").style.display="";$("editorView").style.display="";
   $("homeView").classList.add("view-hidden");$("editorView").classList.remove("view-hidden");render();
@@ -1369,8 +1412,9 @@ function setupTitleSelector(){
   sel.replaceChildren(frag);
 }
 setupTitleSelector();
+$("deckName").addEventListener("input",persistEditorSession);
 $("saveBtn").onclick=saveDeck;
-$("resetBtn").onclick=()=>{if(confirm("現在のデッキを空にしますか？")){deck=[];render();toast("デッキをリセットしました")}};
+$("resetBtn").onclick=()=>{if(confirm("現在のデッキを空にしますか？")){deck=[];persistEditorSession();render();toast("デッキをリセットしました")}};
 $("backBtn").onclick=()=>showHome();
 
 
@@ -1397,6 +1441,7 @@ function sortDeck(mode){
   });
 
   deckSortState[mode]*=-1;
+  persistEditorSession();
   renderDeck();
   updateSortButtons();
   toast(mode==="energy"
@@ -1534,7 +1579,8 @@ cards.push(...opmOfficialComplete116);
 cards.push(...kgrOfficialComplete83);
 
 // Initialize only after every title dataset has been appended to cards.
-migrateLegacyDeck();updateSortButtons();showHome();
+migrateLegacyDeck();updateSortButtons();
+if(!restoreEditorSession())showHome();
 
 </script>
 </body>
