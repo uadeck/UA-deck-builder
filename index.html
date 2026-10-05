@@ -374,6 +374,15 @@ button {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+
+.controls{
+  touch-action: manipulation;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.controls button{
+  touch-action: manipulation;
+}
 </style>
 </head>
 <body>
@@ -961,15 +970,38 @@ function canAdd(card){
   if(qtyOf(card.id)>=card.maxCopies)return false;
   return true;
 }
+function updateCardListQty(cid){
+  const root=$("cardList");
+  if(!root)return;
+  root.querySelectorAll(".card-item").forEach(item=>{
+    if(item.dataset.cardId!==cid)return;
+    const c=cards.find(x=>x.id===cid);
+    const qty=item.querySelector(".qty");
+    const minus=item.querySelector(".minus");
+    const plus=item.querySelector(".plus");
+    if(qty)qty.textContent=qtyOf(cid);
+    if(minus)minus.disabled=qtyOf(cid)<=0;
+    if(plus)plus.disabled=!c||!canAdd(c);
+  });
+}
+function renderAfterQtyChange(cid){
+  renderDeck();
+  renderStatus();
+  updateCardListQty(cid);
+  if(modalCardId===cid)$("modalQty").textContent=qtyOf(cid);
+}
 function addCard(cid){
   const c=cards.find(x=>x.id===cid);
   if(!c||!canAdd(c))return;
   deck.push(cid);
-  render();
+  renderAfterQtyChange(cid);
 }
 function removeCard(cid){
   const i=deck.lastIndexOf(cid);
-  if(i>=0){deck.splice(i,1);render();}
+  if(i>=0){
+    deck.splice(i,1);
+    renderAfterQtyChange(cid);
+  }
 }
 
 /* D&D：デスクトップのHTML5 D&D + pointer操作でタッチ端末にも対応 */
@@ -1162,10 +1194,11 @@ function renderCards(){
   list.forEach(c=>{
     const item=document.createElement("div");
     item.className="card-item";
+    item.dataset.cardId=c.id;
     item.innerHTML=`
       <img class="card-img" referrerpolicy="no-referrer" src="${c.image}" alt="">
       <div class="controls">
-        <button class="minus">−</button>
+        <button class="minus" ${qtyOf(c.id)>0?"":"disabled"}>−</button>
         <div class="qty">${qtyOf(c.id)}</div>
         <button class="plus" ${canAdd(c)?"":"disabled"}>＋</button>
       </div>`;
