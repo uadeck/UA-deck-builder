@@ -284,25 +284,26 @@ button{cursor:pointer}
 .library-toolbar{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .library-back{height:36px;padding:0 12px;border:2px solid var(--line);background:#303238;color:var(--text);font-weight:800}
 .library-folder-title{font-size:18px;font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.title-folder{min-width:0;cursor:pointer;position:relative}
-.title-folder-art{aspect-ratio:16/9;border:2px solid var(--line);border-radius:7px;background:#202126;overflow:hidden;position:relative}
-.title-folder-art img{position:absolute;width:100%;height:auto;left:0;top:0;transform:translateY(var(--crop-y,-12%));display:block}
-.title-folder-shade{position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(transparent,rgba(0,0,0,.82));pointer-events:none}
-.title-folder-meta{position:absolute;left:8px;right:8px;bottom:7px;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none}
+.title-folder{min-width:0;position:relative}
+.title-folder-art{aspect-ratio:525/366;border:2px solid var(--line);border-radius:7px;background:#202126;overflow:hidden;position:relative;cursor:pointer}
+/* UA cards share the same artwork window: x=36..561, y=111..477 on a 600px-wide card. */
+.title-folder-art img,.folder-preview img{position:absolute;width:114.286%;height:auto;left:-6.857%;top:-30.328%;display:block;max-width:none}
+.title-folder-info{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;padding:5px 2px 0}
+.title-folder-meta{min-width:0}
 .title-folder-name{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.title-folder-count{font-size:10px;margin-top:2px;opacity:.86}
-.title-folder-edit{position:absolute;right:6px;top:6px;z-index:2;border:1px solid #aaa;background:#111c;color:#fff;border-radius:5px;padding:5px 7px;font-size:10px;font-weight:800}
-.folder-picker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:46vh;overflow:auto;margin-top:8px}
-.folder-picker-grid button{border:2px solid transparent;background:none;padding:0;aspect-ratio:630/880;overflow:hidden}
+.title-folder-count{font-size:10px;margin-top:2px;color:var(--muted)}
+.title-folder-edit{position:static;border:1px solid #777;background:#303238;color:#fff;border-radius:5px;padding:6px 8px;font-size:10px;font-weight:800}
+.folder-picker-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:5px;margin:8px 0}
+.folder-picker-tools select,.folder-picker-tools button{height:34px;min-width:0;border:1px solid #666;border-radius:4px;background:#303238;color:var(--text);padding:0 7px;font-size:11px;font-weight:800}
+.folder-picker-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;max-height:52vh;overflow:auto;margin-top:8px;padding-bottom:18px}
+.folder-picker-grid button{border:2px solid transparent;background:none;padding:0;aspect-ratio:600/837;overflow:hidden}
 .folder-picker-grid button.selected{border-color:var(--accent)}
 .folder-picker-grid img{width:100%;height:100%;object-fit:cover;display:block}
-.folder-preview{width:min(420px,100%);aspect-ratio:16/9;border:2px solid var(--line);overflow:hidden;position:relative;background:#202126;margin:8px auto}
-.folder-preview img{position:absolute;width:100%;height:auto;left:0;top:0;transform:translateY(var(--crop-y,-12%));display:block}
-.folder-crop-control{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.folder-crop-control input{width:100%}
+.folder-preview{width:min(420px,100%);aspect-ratio:525/366;border:2px solid var(--line);overflow:hidden;position:relative;background:#202126;margin:8px auto}
 @media(max-width:600px){
- .title-folder-art{border-radius:5px}.title-folder-name{font-size:10px}.title-folder-count{font-size:9px}.title-folder-meta{left:5px;right:5px;bottom:5px}
- .title-folder-edit{padding:4px 5px;font-size:9px}.folder-picker-grid{grid-template-columns:repeat(4,1fr)}.library-folder-title{font-size:14px}
+ .title-folder-art{border-radius:5px}.title-folder-name{font-size:10px}.title-folder-count{font-size:9px}
+ .title-folder-edit{padding:5px 6px;font-size:9px}.folder-picker-grid{grid-template-columns:repeat(4,1fr)}.library-folder-title{font-size:14px}
+ .folder-picker-tools{grid-template-columns:1fr 1fr}.folder-picker-tools button{font-size:10px}.folder-preview{width:100%}
 }
 
 /* ===== Mobile / tablet responsive beta ===== */
@@ -418,9 +419,15 @@ button,input,select{touch-action:manipulation}
   .mobile-filter-selects select{height:28px;min-width:0;width:50%;border:1px solid #666;border-radius:4px;background:#303238;color:var(--text);padding:0 3px;font-size:9px;font-weight:800}
   .list-sort{display:flex;width:auto;flex:0 0 auto;align-items:center;gap:2px;overflow:visible;padding:0}.list-sort .filter-label{display:none}
   .list-sort button{height:28px;min-width:0;padding:0 4px;font-size:9px;white-space:nowrap}
-  .card-list-wrap{margin:0;padding:3px 3px max(28px,calc(env(safe-area-inset-bottom) + 12px));flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
-  .card-list{height:100%;align-items:flex-start;gap:5px}.card-item{flex-basis:auto;width:auto;height:100%;max-height:100%;display:grid;grid-template-rows:minmax(0,1fr) 30px;align-content:start}
-  .card-img{width:auto;height:100%;max-height:100%;aspect-ratio:63/88;object-fit:contain}.controls{grid-template-columns:30px 32px 30px;height:30px}.controls button{height:30px;font-size:17px;padding:0}.controls .qty{line-height:30px}
+  /* Mobile card browser: size cards from viewport width, never from the remaining editor height.
+     This keeps +/- presses from resizing the list when deck status/overflow text changes. */
+  .card-list-wrap{margin:0;padding:6px 6px max(40px,calc(env(safe-area-inset-bottom) + 22px));flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  .card-list{height:auto;min-height:100%;align-items:flex-start;gap:8px;padding-bottom:8px}
+  .card-item{flex:0 0 clamp(150px,44vw,220px);width:clamp(150px,44vw,220px);height:auto;max-height:none;display:block;scroll-snap-align:start}
+  .card-img{display:block;width:100%;height:auto;max-height:none;aspect-ratio:63/88;object-fit:contain}
+  .controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;width:100%;height:44px;margin-top:5px}
+  .controls button{width:100%;height:44px;font-size:24px;padding:0;touch-action:manipulation}
+  .controls .qty{width:100%;height:44px;line-height:42px;font-size:18px}
 }
 @media(max-width:480px){.topbar{grid-template-columns:auto minmax(0,1fr) auto auto}.topbar #resetBtn,.topbar #saveBtn,.topbar #deckName,.topbar #backBtn{grid-column:auto;grid-row:auto}}
 
@@ -479,6 +486,15 @@ button {
   <meta name="apple-mobile-web-app-title" content="UA Deck Builder">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
+
+<style>
+@media(max-width:800px){
+  body.editor-open #editorView.app{padding-top:max(18px,env(safe-area-inset-top))!important;}
+  #deckListCaptureArea>div:first-child{gap:10px!important;}
+  #deckListName{flex:1 1 auto!important;max-width:none!important;}
+  #deckListTitle{flex:0 1 42%;text-align:right;white-space:normal!important;line-height:1.15;}
+}
+</style>
 </head>
 <body>
 
@@ -614,9 +630,14 @@ button {
  <div class="modal">
   <button class="close" id="closeFolderCoverModal">閉じる</button>
   <h2 id="folderCoverTitle">フォルダ画像を選択</h2>
-  <div class="cover-help">好きなカードを選び、イラストの見える位置を上下に調整できます。</div>
+  <div class="cover-help">カードを選ぶと、共通のイラスト枠だけを自動で切り抜いてフォルダ画像にします。</div>
   <div id="folderCoverPreview" class="folder-preview"></div>
-  <div class="folder-crop-control"><span>上</span><input id="folderCropRange" type="range" min="-48" max="4" value="-12" step="1"><span>下</span></div>
+  <div class="folder-picker-tools">
+   <select id="folderColorFilter"><option value="">色：すべて</option><option>赤</option><option>青</option><option>緑</option><option>黄</option><option>紫</option></select>
+   <select id="folderEnergyFilter"><option value="">エナジー：すべて</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6+</option></select>
+   <button id="folderSortEnergy" type="button">必要エナジー ↑</button>
+   <button id="folderSortType" type="button">カードの種類 ↑</button>
+  </div>
   <div id="folderCoverPicker" class="folder-picker-grid"></div>
  </div>
 </div>
@@ -632,7 +653,6 @@ button {
         <h1 id="deckListName" style="font-size:26px;line-height:1.15;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></h1>
         <div style="display:flex;align-items:center;gap:16px;white-space:nowrap;flex-shrink:0">
           <div id="deckListTitle" style="font-size:15px;color:#b7bac2"></div>
-          <div id="deckListCount" style="font-size:14px;color:#8f949e"></div>
         </div>
       </div>
       <div id="deckListGrid" style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:0;width:100%"></div>
@@ -1632,30 +1652,42 @@ function renderLibrary(){
   for(const [titleName,decks] of ordered){
     const wrap=document.createElement("article");wrap.className="title-folder";
     const art=document.createElement("div");art.className="title-folder-art";
-    const pref=getFolderCovers()[titleName]||{};const c=folderCardFor(titleName,decks);
-    if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";im.style.setProperty("--crop-y",`${pref.cropY??-12}%`);art.appendChild(im)}
+    const c=folderCardFor(titleName,decks);
+    if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";art.appendChild(im)}
     else art.innerHTML='<div class="library-empty">NO IMAGE</div>';
-    const shade=document.createElement("div");shade.className="title-folder-shade";
+    const info=document.createElement("div");info.className="title-folder-info";
     const meta=document.createElement("div");meta.className="title-folder-meta";meta.innerHTML=`<div class="title-folder-name"></div><div class="title-folder-count">${decks.length}デッキ</div>`;meta.querySelector(".title-folder-name").textContent=titleName;
     const edit=document.createElement("button");edit.type="button";edit.className="title-folder-edit";edit.textContent="画像変更";edit.onclick=e=>{e.stopPropagation();openFolderCoverPicker(titleName)};
-    art.append(shade,meta,edit);wrap.appendChild(art);wrap.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};root.appendChild(wrap);
+    art.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};meta.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};
+    info.append(meta,edit);wrap.append(art,info);root.appendChild(wrap);
   }
 }
+let folderPickerSort={mode:"energy",dir:1};
 function openFolderCoverPicker(titleName){
   editingFolderTitle=titleName;const opts=cards.filter(c=>c.title===titleName);if(!opts.length){toast("このタイトルのカード画像がありません");return}
-  const saved=getFolderCovers()[titleName]||{};editingFolderCardId=saved.cardId&&opts.some(c=>c.id===saved.cardId)?saved.cardId:opts.find(c=>c.type==="キャラクター")?.id||opts[0].id;editingFolderCrop=saved.cropY??-12;
+  const saved=getFolderCovers()[titleName]||{};editingFolderCardId=saved.cardId&&opts.some(c=>c.id===saved.cardId)?saved.cardId:opts.find(c=>c.type==="キャラクター")?.id||opts[0].id;
   $("folderCoverTitle").textContent=`${titleName}：フォルダ画像`;
+  $("folderColorFilter").value="";$("folderEnergyFilter").value="";folderPickerSort={mode:"energy",dir:1};
+  renderFolderCoverPicker();updateFolderCoverPreview();$("folderCoverBackdrop").classList.add("show");
+}
+function folderPickerCards(){
+  const color=$("folderColorFilter").value,ev=$("folderEnergyFilter").value;
+  const typeOrder={"キャラクター":0,"イベント":1,"フィールド":2};
+  let a=cards.filter(c=>c.title===editingFolderTitle&&(!color||c.color===color)&&(!ev||(ev==="6"?c.energy>=6:String(c.energy)===ev)));
+  const mode=folderPickerSort.mode,dir=folderPickerSort.dir;
+  return a.sort((x,y)=>{const r=mode==="energy"?(x.energy-y.energy)||((typeOrder[x.type]??99)-(typeOrder[y.type]??99)):((typeOrder[x.type]??99)-(typeOrder[y.type]??99))||(x.energy-y.energy);return r*dir});
+}
+function renderFolderCoverPicker(){
   const picker=$("folderCoverPicker");picker.innerHTML="";
-  for(const c of opts){const b=document.createElement("button");b.type="button";b.title=c.name;b.dataset.cardId=c.id;const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;b.appendChild(im);b.onclick=()=>{editingFolderCardId=c.id;updateFolderCoverPicker();};picker.appendChild(b)}
-  $("folderCropRange").value=editingFolderCrop;updateFolderCoverPicker();$("folderCoverBackdrop").classList.add("show");
+  for(const c of folderPickerCards()){const b=document.createElement("button");b.type="button";b.title=c.name;b.dataset.cardId=c.id;const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;b.appendChild(im);b.classList.toggle("selected",c.id===editingFolderCardId);b.onclick=()=>{editingFolderCardId=c.id;setFolderCover(editingFolderTitle,c.id,0);updateFolderCoverPreview();renderFolderCoverPicker()};picker.appendChild(b)}
 }
-function updateFolderCoverPicker(){
+function updateFolderCoverPreview(){
   const c=cards.find(x=>x.id===editingFolderCardId),preview=$("folderCoverPreview");preview.innerHTML="";
-  if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;im.style.setProperty("--crop-y",`${editingFolderCrop}%`);preview.appendChild(im)}
-  $("folderCoverPicker").querySelectorAll("button").forEach(b=>b.classList.toggle("selected",b.dataset.cardId===editingFolderCardId));
-  if(editingFolderTitle&&editingFolderCardId)setFolderCover(editingFolderTitle,editingFolderCardId,editingFolderCrop);
+  if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;preview.appendChild(im)}
 }
-$("folderCropRange").addEventListener("input",e=>{editingFolderCrop=Number(e.target.value);updateFolderCoverPicker()});
+["folderColorFilter","folderEnergyFilter"].forEach(id=>$(id).addEventListener("change",renderFolderCoverPicker));
+$("folderSortEnergy").onclick=()=>{if(folderPickerSort.mode==="energy")folderPickerSort.dir*=-1;else folderPickerSort={mode:"energy",dir:1};renderFolderCoverPicker()};
+$("folderSortType").onclick=()=>{if(folderPickerSort.mode==="type")folderPickerSort.dir*=-1;else folderPickerSort={mode:"type",dir:1};renderFolderCoverPicker()};
 $("closeFolderCoverModal").onclick=()=>{$("folderCoverBackdrop").classList.remove("show");renderLibrary()};
 $("folderCoverBackdrop").addEventListener("click",e=>{if(e.target===$("folderCoverBackdrop")){e.currentTarget.classList.remove("show");renderLibrary()}});
 function openLibraryDeck(id){
@@ -1677,7 +1709,6 @@ function showDeckListView(id){
 
   $("deckListName").textContent=d.name||"名称未設定";
   $("deckListTitle").textContent=d.title||title;
-  $("deckListCount").textContent=`${d.cards.length} / 50枚`;
 
   const grid=$("deckListGrid");
   grid.innerHTML="";
