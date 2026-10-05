@@ -1170,8 +1170,23 @@ function renderCards(){
         <button class="plus" ${canAdd(c)?"":"disabled"}>＋</button>
       </div>`;
     item.querySelector(".card-img").addEventListener("click",()=>openModal(c.id));
-    item.querySelector(".minus").addEventListener("click",()=>removeCard(c.id));
-    item.querySelector(".plus").addEventListener("click",()=>addCard(c.id));
+
+    const minusBtn=item.querySelector(".minus");
+    const plusBtn=item.querySelector(".plus");
+    const fastPress=(btn,action)=>{
+      btn.addEventListener("pointerdown",e=>{
+        if(e.pointerType==="touch"){
+          e.preventDefault();
+          action();
+        }
+      });
+      btn.addEventListener("click",e=>{
+        // Touch already fired on pointerdown; keep click for mouse/keyboard.
+        if(e.detail===0 || !("PointerEvent" in window) || e.pointerType==="mouse") action();
+      });
+    };
+    fastPress(minusBtn,()=>removeCard(c.id));
+    fastPress(plusBtn,()=>addCard(c.id));
     root.appendChild(item);
   });
 }
@@ -1195,8 +1210,27 @@ function openModal(cid){
 function closeModal(){ $("modalBackdrop").classList.remove("show");modalCardId=null }
 $("closeModal").onclick=closeModal;
 $("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal()});
-$("modalMinus").onclick=()=>{if(modalCardId!=null)removeCard(modalCardId);if(modalCardId!=null)openModal(modalCardId)};
-$("modalPlus").onclick=()=>{if(modalCardId!=null)addCard(modalCardId);if(modalCardId!=null)openModal(modalCardId)};
+function updateModalAfterQtyChange(){
+  if(modalCardId==null)return;
+  $("modalQty").textContent=qtyOf(modalCardId);
+}
+function bindFastQtyButton(el,action){
+  el.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="touch"){
+      e.preventDefault();
+      action();
+      updateModalAfterQtyChange();
+    }
+  });
+  el.addEventListener("click",e=>{
+    if(e.detail===0 || !("PointerEvent" in window) || e.pointerType==="mouse"){
+      action();
+      updateModalAfterQtyChange();
+    }
+  });
+}
+bindFastQtyButton($("modalMinus"),()=>{if(modalCardId!=null)removeCard(modalCardId)});
+bindFastQtyButton($("modalPlus"),()=>{if(modalCardId!=null)addCard(modalCardId)});
 
 function toast(msg){
   const t=$("toast");t.textContent=msg;t.classList.add("show");
@@ -1469,23 +1503,6 @@ cards.push(...kgrOfficialComplete83);
 // Initialize only after every title dataset has been appended to cards.
 migrateLegacyDeck();updateSortButtons();showHome();
 
-// iOS Safari: suppress double-tap zoom on rapid deck +/- interactions
-// without disabling normal pinch zoom for the page.
-(function(){
-  let lastTouchEnd = 0;
-  document.addEventListener("touchend", function(e){
-    const target = e.target && e.target.closest
-      ? e.target.closest("button, .deck-slot")
-      : null;
-    if(!target) return;
-
-    const now = Date.now();
-    if(now - lastTouchEnd <= 350){
-      e.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, {passive:false});
-})();
 </script>
 </body>
 </html>
