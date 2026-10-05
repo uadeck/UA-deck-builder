@@ -279,6 +279,32 @@ button{cursor:pointer}
 
 
 
+
+/* ===== Title visual folders ===== */
+.library-toolbar{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.library-back{height:36px;padding:0 12px;border:2px solid var(--line);background:#303238;color:var(--text);font-weight:800}
+.library-folder-title{font-size:18px;font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.title-folder{min-width:0;cursor:pointer;position:relative}
+.title-folder-art{aspect-ratio:16/9;border:2px solid var(--line);border-radius:7px;background:#202126;overflow:hidden;position:relative}
+.title-folder-art img{position:absolute;width:100%;height:auto;left:0;top:0;transform:translateY(var(--crop-y,-12%));display:block}
+.title-folder-shade{position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(transparent,rgba(0,0,0,.82));pointer-events:none}
+.title-folder-meta{position:absolute;left:8px;right:8px;bottom:7px;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none}
+.title-folder-name{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title-folder-count{font-size:10px;margin-top:2px;opacity:.86}
+.title-folder-edit{position:absolute;right:6px;top:6px;z-index:2;border:1px solid #aaa;background:#111c;color:#fff;border-radius:5px;padding:5px 7px;font-size:10px;font-weight:800}
+.folder-picker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:46vh;overflow:auto;margin-top:8px}
+.folder-picker-grid button{border:2px solid transparent;background:none;padding:0;aspect-ratio:630/880;overflow:hidden}
+.folder-picker-grid button.selected{border-color:var(--accent)}
+.folder-picker-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.folder-preview{width:min(420px,100%);aspect-ratio:16/9;border:2px solid var(--line);overflow:hidden;position:relative;background:#202126;margin:8px auto}
+.folder-preview img{position:absolute;width:100%;height:auto;left:0;top:0;transform:translateY(var(--crop-y,-12%));display:block}
+.folder-crop-control{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.folder-crop-control input{width:100%}
+@media(max-width:600px){
+ .title-folder-art{border-radius:5px}.title-folder-name{font-size:10px}.title-folder-count{font-size:9px}.title-folder-meta{left:5px;right:5px;bottom:5px}
+ .title-folder-edit{padding:4px 5px;font-size:9px}.folder-picker-grid{grid-template-columns:repeat(4,1fr)}.library-folder-title{font-size:14px}
+}
+
 /* ===== Mobile / tablet responsive beta ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,input,select{touch-action:manipulation}
@@ -330,9 +356,19 @@ button,input,select{touch-action:manipulation}
   .library-actions button{min-height:46px}
   .cover-picker{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 
-  #deckListView>div{padding:8px!important}
-  #deckListView>div>div{padding:8px!important;overflow-x:auto}
-  #deckListGrid{min-width:0!important;width:100%!important;grid-template-columns:repeat(10,minmax(0,1fr))!important}
+  /* Smartphone deck-list view: preserve the meaningful 10x5 order and use the phone width edge-to-edge. */
+  #deckListView{padding:2px!important;padding-top:max(6px,env(safe-area-inset-top))!important;padding-bottom:max(18px,calc(env(safe-area-inset-bottom) + 10px))!important;overflow-x:hidden!important}
+  #deckListView>div{padding:0!important;margin:0!important;width:100%!important;max-width:none!important}
+  #deckListView .decklist-view-controls{padding:0 6px!important;gap:6px!important;align-items:center!important;margin-bottom:8px!important}
+  #deckListView #closeDeckListView{padding:8px 8px!important;min-width:84px!important;font-size:12px!important;line-height:1.2!important}
+  #deckListView .decklist-view-controls>span{font-size:9px!important;line-height:1.25!important}
+  #deckListCaptureArea{padding:4px 0 10px!important;margin:0!important;width:100%!important;max-width:none!important}
+  #deckListCaptureArea>div:first-child{padding:0 4px!important;gap:5px!important;margin-bottom:7px!important;align-items:end!important}
+  #deckListName{font-size:19px!important;line-height:1.1!important}
+  #deckListTitle{font-size:10px!important}
+  #deckListCount{font-size:10px!important}
+  #deckListGrid{min-width:0!important;width:100%!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:0!important}
+  #deckListGrid img{display:block!important;width:100%!important;height:auto!important}
 }
 
 @media(max-width:480px){
@@ -358,6 +394,44 @@ button,input,select{touch-action:manipulation}
   .library-actions{grid-template-columns:1fr}
   .cover-picker{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+/* ===== Mobile compact editor ===== */
+.mobile-filter-selects{display:none}
+@media(max-width:800px){
+  #editorView.app{height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:3px;gap:3px}
+  #editorView.view-hidden{display:none!important}
+  .topbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:3px;margin:0;flex:0 0 auto}
+  .topbar #backBtn,.topbar #deckName,.topbar #resetBtn,.topbar #saveBtn{grid-column:auto;grid-row:auto}
+  .topbar input{height:30px;min-width:0;font-size:12px;padding:0 5px}
+  .topbar button{height:30px;min-width:0;padding:0 6px;font-size:10px}
+  .topbar #backBtn{font-size:0}.topbar #backBtn::after{content:"一覧";font-size:10px}
+  .deck-panel{padding:3px;margin:0;flex:0 0 auto;overflow:visible}
+  .deck-head{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:2px 4px;margin-bottom:3px;align-items:center}
+  .deck-summary{grid-column:1;grid-row:1;display:flex;align-items:baseline;gap:6px;min-width:0}
+  .count{font-size:14px;line-height:20px}.status{font-size:9px;white-space:nowrap}
+  .deck-sort{grid-column:2;grid-row:1;display:flex;justify-content:flex-end;overflow:visible;padding:0;gap:2px}
+  .deck-sort span{display:none}.deck-sort button{height:25px;min-width:0;padding:0 5px;font-size:9px}
+  .title-label{grid-column:1/-1;grid-row:2;font-size:9px;line-height:14px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .deck-grid{gap:1px}.overflow{margin-top:3px;padding:3px 5px;font-size:9px;line-height:1.2}.overflow strong{font-size:9px}
+  .filters{padding:3px;margin:0;flex:0 0 auto}.filter-row{display:flex;align-items:center;gap:3px;min-width:0}
+  .color-filter,.energy-filter{display:none}.mobile-filter-selects{display:flex;gap:3px;min-width:0;flex:1 1 auto}
+  .mobile-filter-selects select{height:28px;min-width:0;width:50%;border:1px solid #666;border-radius:4px;background:#303238;color:var(--text);padding:0 3px;font-size:9px;font-weight:800}
+  .list-sort{display:flex;width:auto;flex:0 0 auto;align-items:center;gap:2px;overflow:visible;padding:0}.list-sort .filter-label{display:none}
+  .list-sort button{height:28px;min-width:0;padding:0 4px;font-size:9px;white-space:nowrap}
+  .card-list-wrap{margin:0;padding:3px 3px max(28px,calc(env(safe-area-inset-bottom) + 12px));flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  .card-list{height:100%;align-items:flex-start;gap:5px}.card-item{flex-basis:auto;width:auto;height:100%;max-height:100%;display:grid;grid-template-rows:minmax(0,1fr) 30px;align-content:start}
+  .card-img{width:auto;height:100%;max-height:100%;aspect-ratio:63/88;object-fit:contain}.controls{grid-template-columns:30px 32px 30px;height:30px}.controls button{height:30px;font-size:17px;padding:0}.controls .qty{line-height:30px}
+}
+@media(max-width:480px){.topbar{grid-template-columns:auto minmax(0,1fr) auto auto}.topbar #resetBtn,.topbar #saveBtn,.topbar #deckName,.topbar #backBtn{grid-column:auto;grid-row:auto}}
+
+/* Mobile: keep the editor entirely inside the visible app viewport. */
+@media(max-width:800px){
+  body.editor-open{height:100dvh;overflow:hidden}
+  body.editor-open #editorView.app{height:100dvh;max-height:100dvh;overflow:hidden}
+  .create-bar{bottom:max(12px,env(safe-area-inset-bottom));padding-bottom:7px}
+  .home{padding-bottom:max(104px,calc(env(safe-area-inset-bottom) + 88px))}
+}
+
 
 @media(min-width:801px) and (max-width:1100px){
   .app{max-width:100%;padding:8px}
@@ -388,7 +462,23 @@ button {
   opacity:.42;
   cursor:default;
 }
+
+/* Deck manual reorder: the deck grid must own touch movement on iPhone/PWA.
+   The generic manipulation rule above is kept for buttons, but not deck cards. */
+#deckGrid .deck-slot,
+#deckGrid .deck-slot img{
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
 </style>
+  <meta name="theme-color" content="#111318">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="UA Deck Builder">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
 
@@ -459,6 +549,10 @@ button {
         <label class="energy-check"><input type="checkbox" name="energy" value="6">6</label>
         <label class="energy-check"><input type="checkbox" name="energy" value="7+">7+</label>
       </div>
+      <div class="mobile-filter-selects" aria-label="スマホ用フィルター">
+        <select id="mobileColorFilter" aria-label="色フィルター"><option value="">色：すべて</option><option value="赤">赤</option><option value="青">青</option><option value="緑">緑</option><option value="黄">黄</option><option value="紫">紫</option></select>
+        <select id="mobileEnergyFilter" aria-label="必要エナジーフィルター"><option value="">エナジー：すべて</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7+">7+</option></select>
+      </div>
       <div class="list-sort" aria-label="カード一覧ソート">
         <span class="filter-label">ソート</span>
         <button id="listSortEnergy" type="button">必要エナジー ↑</button>
@@ -516,6 +610,17 @@ button {
 </div>
 
 
+<div id="folderCoverBackdrop" class="modal-backdrop cover-modal">
+ <div class="modal">
+  <button class="close" id="closeFolderCoverModal">閉じる</button>
+  <h2 id="folderCoverTitle">フォルダ画像を選択</h2>
+  <div class="cover-help">好きなカードを選び、イラストの見える位置を上下に調整できます。</div>
+  <div id="folderCoverPreview" class="folder-preview"></div>
+  <div class="folder-crop-control"><span>上</span><input id="folderCropRange" type="range" min="-48" max="4" value="-12" step="1"><span>下</span></div>
+  <div id="folderCoverPicker" class="folder-picker-grid"></div>
+ </div>
+</div>
+
 <div id="deckListView" style="display:none;min-height:100vh;background:#17181b;color:#fff;padding:18px;box-sizing:border-box">
   <div style="max-width:1200px;margin:0 auto">
     <div class="decklist-view-controls" style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
@@ -548,25 +653,26 @@ const TITLES=[
   {id:"鬼滅の刃",label:"鬼滅の刃",code:"KMY",enabled:true},
   {id:"Tales of ARISE",label:"Tales of ARISE",code:"TOA",enabled:true},
   {id:"転生したらスライムだった件",label:"転生したらスライムだった件",code:"TSK",enabled:true},
-  {id:"BLEACH 千年血戦篇",label:"BLEACH 千年血戦篇",code:"BLK",enabled:true},
   {id:"僕とロボコ",label:"僕とロボコ",code:"BTR",enabled:true},
   {id:"僕のヒーローアカデミア",label:"僕のヒーローアカデミア",code:"MHA",enabled:true},
   {id:"銀魂",label:"銀魂",code:"GNT",enabled:true},
+  {id:"BLEACH 千年血戦篇",label:"BLEACH 千年血戦篇",code:"BLK",enabled:true},
   {id:"ブルーロック",label:"ブルーロック",code:"BLC",enabled:true},
   {id:"鉄拳7",label:"鉄拳7",code:"TEK",enabled:true},
   {id:"Dr.STONE",label:"Dr.STONE",code:"DST",enabled:true},
   {id:"ソードアート・オンライン",label:"ソードアート・オンライン",code:"SAO",enabled:true},
-  {id:"ブラッククローバー",label:"ブラッククローバー",code:"BCL",enabled:true},
   {id:"SYNDUALITY Noir",label:"SYNDUALITY Noir",code:"SYN",enabled:true},
   {id:"トリコ",label:"トリコ",code:"TOR",enabled:true},
-  {id:"幽☆遊☆白書",label:"幽☆遊☆白書",code:"YYH",enabled:true},
   {id:"勝利の女神：NIKKE",label:"勝利の女神：NIKKE",code:"NIK",enabled:true},
   {id:"ハイキュー‼",label:"ハイキュー‼",code:"HQ",enabled:true},
+  {id:"ブラッククローバー",label:"ブラッククローバー",code:"BCL",enabled:true},
+  {id:"幽☆遊☆白書",label:"幽☆遊☆白書",code:"YYH",enabled:true},
   {id:"GAMERA -Rebirth-",label:"GAMERA -Rebirth-",code:"GAR",enabled:true},
   {id:"進撃の巨人",label:"進撃の巨人",code:"AOT",enabled:true},
   {id:"SHY",label:"SHY",code:"SHY",enabled:true},
   {id:"アンデッドアンラック",label:"アンデッドアンラック",code:"UND",enabled:true},
   {id:"君のことが大大大大大好きな100人の彼女",label:"君のことが大大大大大好きな100人の彼女",code:"HYK",enabled:true},
+  {id:"WIND BREAKER",label:"WIND BREAKER",code:"WIN",enabled:true},
   {id:"学園アイドルマスター",label:"学園アイドルマスター",code:"GIM",enabled:true},
   {id:"怪獣８号",label:"怪獣８号",code:"KJ8",enabled:true},
   {id:"仮面ライダー",label:"仮面ライダー",code:"KMR",enabled:true},
@@ -578,30 +684,29 @@ const TITLES=[
   {id:"ワンパンマン",label:"ワンパンマン",code:"OPM",enabled:true},
   {id:"「マクロス」シリーズ",label:"「マクロス」シリーズ",code:"MAC",enabled:true},
   {id:"鋼の錬金術師 FULLMETAL ALCHEMIST",label:"鋼の錬金術師 FULLMETAL ALCHEMIST",code:"FMA",enabled:true},
-  {id:"WIND BREAKER",label:"WIND BREAKER",code:"WIN",enabled:true},
   {id:"キン肉マン",label:"キン肉マン",code:"KNM",enabled:true},
-  {id:"るろうに剣心 －明治剣客浪漫譚－",label:"るろうに剣心 －明治剣客浪漫譚－",code:"RKN",enabled:true},
-  {id:"SAKAMOTO DAYS",label:"SAKAMOTO DAYS",code:"SKM",enabled:true},
   {id:"Re:ゼロから始める異世界生活",label:"Re:ゼロから始める異世界生活",code:"REZ",enabled:true},
+  {id:"るろうに剣心 －明治剣客浪漫譚－",label:"るろうに剣心 －明治剣客浪漫譚－",code:"RKN",enabled:true},
   {id:"〈物語〉シリーズ",label:"〈物語〉シリーズ",code:"MNG",enabled:true},
+  {id:"SAKAMOTO DAYS",label:"SAKAMOTO DAYS",code:"SKM",enabled:true},
   {id:"ヱヴァンゲリヲン新劇場版",label:"ヱヴァンゲリヲン新劇場版",code:"EVA",enabled:true},
   {id:"To LOVEる-とらぶる-",label:"To LOVEる-とらぶる-",code:"TLV",enabled:true},
-  {id:"俺だけレベルアップな件",label:"俺だけレベルアップな件",code:"ORL",enabled:true},
-  {id:"キングダム",label:"キングダム",code:"KNG",enabled:true},
   {id:"東京喰種",label:"東京喰種",code:"TKG",enabled:true},
   {id:"カグラバチ",label:"カグラバチ",code:"KGB",enabled:true},
+  {id:"キングダム",label:"キングダム",code:"KNG",enabled:true},
   {id:"魔都精兵のスレイブ",label:"魔都精兵のスレイブ",code:"MTS",enabled:true},
-  {id:"犬夜叉",label:"犬夜叉",code:"INY",enabled:true},
+  {id:"俺だけレベルアップな件",label:"俺だけレベルアップな件",code:"ORL",enabled:true},
   {id:"チェンソーマン",label:"チェンソーマン",code:"CSM",enabled:true},
-  {id:"D.Gray-man",label:"D.Gray-man",code:"DGM",enabled:false},
-  {id:"無職転生 ～異世界行ったら本気だす～",label:"無職転生 ～異世界行ったら本気だす～",code:"MST",enabled:true},
   {id:"陰の実力者になりたくて！",label:"陰の実力者になりたくて！",code:"KGE",enabled:true},
-  {id:"天元突破グレンラガン",label:"天元突破グレンラガン",code:"GLN",enabled:true},
+  {id:"犬夜叉",label:"犬夜叉",code:"INY",enabled:true},
+  {id:"無職転生 ～異世界行ったら本気だす～",label:"無職転生 ～異世界行ったら本気だす～",code:"MST",enabled:true},
   {id:"アイドルマスター シンデレラガールズ",label:"アイドルマスター シンデレラガールズ",code:"IDC",enabled:true},
-  {id:"ウマ娘 プリティーダービー",label:"ウマ娘 プリティーダービー",code:"UMM",enabled:false},
+  {id:"天元突破グレンラガン",label:"天元突破グレンラガン",code:"GLN",enabled:true},
   {id:"シュタインズ・ゲート",label:"シュタインズ・ゲート",code:"STG",enabled:false},
-  {id:"涼宮ハルヒの憂鬱",label:"涼宮ハルヒの憂鬱",code:"HRH",enabled:false},
+  {id:"D.Gray-man",label:"D.Gray-man",code:"DGM",enabled:false},
+  {id:"ウマ娘 プリティーダービー",label:"ウマ娘 プリティーダービー",code:"UMM",enabled:false},
   {id:"いちご100％",label:"いちご100％",code:"ICG",enabled:false},
+  {id:"涼宮ハルヒの憂鬱",label:"涼宮ハルヒの憂鬱",code:"HRH",enabled:false},
   {id:"ジョジョの奇妙な冒険",label:"ジョジョの奇妙な冒険",code:"JJBA",enabled:false}
 ];
 let title="HUNTER×HUNTER";
@@ -611,9 +716,14 @@ const cgh1PendingEnergy=[{"id":"UA01BT/CGH-1-001","name":"扇 要","title":"コ�
 const LEGACY_STORAGE_KEY="uaDeckPrototypeV2";
 const STORAGE_KEY="uaDeckLibraryV1";
 const EDITOR_SESSION_KEY="uaDeckEditorSessionV1";
+const FOLDER_COVER_KEY="uaDeckFolderCoversV1";
 let currentDeckId=null;
 let selectedLibraryDeckId=null;
 let deckLibraryScrollY=0;
+let openLibraryTitle=null;
+let editingFolderTitle=null;
+let editingFolderCardId=null;
+let editingFolderCrop=-12;
 
 function svgCard(name,color,energy,type,special=""){
   const colorMap={赤:"#d9534f",青:"#3b82c4",緑:"#43a047",黄:"#d4a72c",紫:"#8e44ad"};
@@ -1091,6 +1201,12 @@ function attachDrag(slot,index){
       openModal(deck[from]);
     }
   });
+  img.addEventListener("pointercancel",()=>{
+    pointerStart=null;
+    pointerDragging=false;
+    slot.classList.remove("dragging");
+    document.querySelectorAll(".drag-over").forEach(x=>x.classList.remove("drag-over"));
+  });
 }
 
 function getDeckValidationErrors(){
@@ -1174,8 +1290,11 @@ function updateSortButtons(){
 }
 
 function renderCards(){
-  const selectedColors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value);
-  const selectedEnergy=[...document.querySelectorAll('input[name="energy"]:checked')].map(x=>x.value);
+  const mobileUI=window.matchMedia("(max-width:800px)").matches;
+  const mobileColor=$("mobileColorFilter")?.value||"";
+  const mobileEnergy=$("mobileEnergyFilter")?.value||"";
+  const selectedColors=mobileUI ? (mobileColor?[mobileColor]:[]) : [...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value);
+  const selectedEnergy=mobileUI ? (mobileEnergy?[mobileEnergy]:[]) : [...document.querySelectorAll('input[name="energy"]:checked')].map(x=>x.value);
   const sort=listSortState.mode;
   const dir=listSortState.dir;
   let list=cards.filter(c=>c.title===title).filter(c=>{
@@ -1367,9 +1486,12 @@ function loadDeck(id){
 }
 function resetCardFilters(){
   document.querySelectorAll('input[name="color"], input[name="energy"]').forEach(el=>{el.checked=false});
+  if($("mobileColorFilter"))$("mobileColorFilter").value="";
+  if($("mobileEnergyFilter"))$("mobileEnergyFilter").value="";
   listSortState.mode="energy";listSortState.dir=1;updateSortButtons();
 }
 function showHome(){
+  document.body.classList.remove("editor-open");
   clearEditorSession();
   resetCardFilters();
   const cardListWrap=document.querySelector(".card-list-wrap");
@@ -1382,6 +1504,7 @@ function showHome(){
   $("editorView").classList.add("view-hidden");$("homeView").classList.remove("view-hidden");renderLibrary();
 }
 function showEditor(){
+  document.body.classList.add("editor-open");
   persistEditorSession();
   $("deckListView").style.display="none";
   $("homeView").style.display="";$("editorView").style.display="";
@@ -1465,20 +1588,76 @@ function toggleListSort(mode){
 $("listSortEnergy").onclick=()=>toggleListSort("energy");
 $("listSortType").onclick=()=>toggleListSort("type");
 document.querySelectorAll('input[name="color"], input[name="energy"]').forEach(el=>el.addEventListener("change",renderCards));
+["mobileColorFilter","mobileEnergyFilter"].forEach(id=>$(id)?.addEventListener("change",renderCards));
+window.matchMedia("(max-width:800px)").addEventListener?.("change",renderCards);
 
 
+function getFolderCovers(){
+  try{return JSON.parse(localStorage.getItem(FOLDER_COVER_KEY)||"{}")||{}}catch{return {}}
+}
+function setFolderCover(titleName,cardId,cropY){
+  const data=getFolderCovers();data[titleName]={cardId,cropY:Number(cropY)||0};localStorage.setItem(FOLDER_COVER_KEY,JSON.stringify(data));
+}
+function folderCardFor(titleName,decks){
+  const pref=getFolderCovers()[titleName];
+  return cards.find(c=>c.id===pref?.cardId&&c.title===titleName)
+    ||cards.find(c=>c.title===titleName&&c.type==="キャラクター")
+    ||cards.find(c=>c.title===titleName)
+    ||cards.find(c=>decks.some(d=>(d.cards||[]).includes(c.id)));
+}
 function renderLibrary(){
   const root=$("deckLibrary"),items=getDecks().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));root.innerHTML="";
-  if(!items.length){root.innerHTML='<div class="home-empty">まだデッキがありません。<br>下の「デッキ作成」から作成できます。</div>';return}
-  for(const d of items){
-    const wrap=document.createElement("article");wrap.className="library-card";
-    const cover=document.createElement("div");cover.className="library-cover";
-    const c=cards.find(x=>x.id===d.coverId)||cards.find(x=>x.id===(d.cards||[])[0]);
-    if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";cover.appendChild(im)}else cover.innerHTML='<div class="library-empty">NO IMAGE</div>';
-    const nm=document.createElement("div");nm.className="library-name";nm.textContent=d.name||"名称未設定";
-    wrap.append(cover,nm);wrap.onclick=()=>openLibraryDeck(d.id);root.appendChild(wrap);
+  if(!items.length){openLibraryTitle=null;root.innerHTML='<div class="home-empty">まだデッキがありません。<br>下の「デッキ作成」から作成できます。</div>';return}
+  if(openLibraryTitle){
+    const group=items.filter(d=>d.title===openLibraryTitle);
+    if(!group.length){openLibraryTitle=null;renderLibrary();return}
+    const bar=document.createElement("div");bar.className="library-toolbar";
+    const back=document.createElement("button");back.type="button";back.className="library-back";back.textContent="← タイトル一覧";back.onclick=()=>{openLibraryTitle=null;renderLibrary()};
+    const heading=document.createElement("div");heading.className="library-folder-title";heading.textContent=openLibraryTitle;
+    bar.append(back,heading);root.appendChild(bar);
+    for(const d of group){
+      const wrap=document.createElement("article");wrap.className="library-card";
+      const cover=document.createElement("div");cover.className="library-cover";
+      const c=cards.find(x=>x.id===d.coverId)||cards.find(x=>x.id===(d.cards||[])[0]);
+      if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";cover.appendChild(im)}else cover.innerHTML='<div class="library-empty">NO IMAGE</div>';
+      const nm=document.createElement("div");nm.className="library-name";nm.textContent=d.name||"名称未設定";
+      wrap.append(cover,nm);wrap.onclick=()=>openLibraryDeck(d.id);root.appendChild(wrap);
+    }
+    return;
+  }
+  const groups=new Map();for(const d of items){if(!groups.has(d.title))groups.set(d.title,[]);groups.get(d.title).push(d)}
+  const ordered=[...groups.entries()].sort((a,b)=>{
+    const ai=TITLES.findIndex(t=>t.id===a[0]),bi=TITLES.findIndex(t=>t.id===b[0]);return (ai<0?999:ai)-(bi<0?999:bi);
+  });
+  for(const [titleName,decks] of ordered){
+    const wrap=document.createElement("article");wrap.className="title-folder";
+    const art=document.createElement("div");art.className="title-folder-art";
+    const pref=getFolderCovers()[titleName]||{};const c=folderCardFor(titleName,decks);
+    if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";im.style.setProperty("--crop-y",`${pref.cropY??-12}%`);art.appendChild(im)}
+    else art.innerHTML='<div class="library-empty">NO IMAGE</div>';
+    const shade=document.createElement("div");shade.className="title-folder-shade";
+    const meta=document.createElement("div");meta.className="title-folder-meta";meta.innerHTML=`<div class="title-folder-name"></div><div class="title-folder-count">${decks.length}デッキ</div>`;meta.querySelector(".title-folder-name").textContent=titleName;
+    const edit=document.createElement("button");edit.type="button";edit.className="title-folder-edit";edit.textContent="画像変更";edit.onclick=e=>{e.stopPropagation();openFolderCoverPicker(titleName)};
+    art.append(shade,meta,edit);wrap.appendChild(art);wrap.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};root.appendChild(wrap);
   }
 }
+function openFolderCoverPicker(titleName){
+  editingFolderTitle=titleName;const opts=cards.filter(c=>c.title===titleName);if(!opts.length){toast("このタイトルのカード画像がありません");return}
+  const saved=getFolderCovers()[titleName]||{};editingFolderCardId=saved.cardId&&opts.some(c=>c.id===saved.cardId)?saved.cardId:opts.find(c=>c.type==="キャラクター")?.id||opts[0].id;editingFolderCrop=saved.cropY??-12;
+  $("folderCoverTitle").textContent=`${titleName}：フォルダ画像`;
+  const picker=$("folderCoverPicker");picker.innerHTML="";
+  for(const c of opts){const b=document.createElement("button");b.type="button";b.title=c.name;b.dataset.cardId=c.id;const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;b.appendChild(im);b.onclick=()=>{editingFolderCardId=c.id;updateFolderCoverPicker();};picker.appendChild(b)}
+  $("folderCropRange").value=editingFolderCrop;updateFolderCoverPicker();$("folderCoverBackdrop").classList.add("show");
+}
+function updateFolderCoverPicker(){
+  const c=cards.find(x=>x.id===editingFolderCardId),preview=$("folderCoverPreview");preview.innerHTML="";
+  if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt=c.name;im.style.setProperty("--crop-y",`${editingFolderCrop}%`);preview.appendChild(im)}
+  $("folderCoverPicker").querySelectorAll("button").forEach(b=>b.classList.toggle("selected",b.dataset.cardId===editingFolderCardId));
+  if(editingFolderTitle&&editingFolderCardId)setFolderCover(editingFolderTitle,editingFolderCardId,editingFolderCrop);
+}
+$("folderCropRange").addEventListener("input",e=>{editingFolderCrop=Number(e.target.value);updateFolderCoverPicker()});
+$("closeFolderCoverModal").onclick=()=>{$("folderCoverBackdrop").classList.remove("show");renderLibrary()};
+$("folderCoverBackdrop").addEventListener("click",e=>{if(e.target===$("folderCoverBackdrop")){e.currentTarget.classList.remove("show");renderLibrary()}});
 function openLibraryDeck(id){
   const d=getDeckRecord(id);if(!d)return;selectedLibraryDeckId=id;
   const c=cards.find(x=>x.id===d.coverId)||cards.find(x=>x.id===(d.cards||[])[0]);
@@ -1582,6 +1761,15 @@ cards.push(...kgrOfficialComplete83);
 migrateLegacyDeck();updateSortButtons();
 if(!restoreEditorSession())showHome();
 
+
+// PWA service worker
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(err=>{
+      console.warn("Service Worker registration failed:",err);
+    });
+  });
+}
 </script>
 </body>
 </html>
