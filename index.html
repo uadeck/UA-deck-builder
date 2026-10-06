@@ -435,8 +435,9 @@ button,input,select{touch-action:manipulation}
 @media(max-width:800px){
   body.editor-open{height:100dvh;overflow:hidden}
   body.editor-open #editorView.app{height:100dvh;max-height:100dvh;overflow:hidden}
-  .create-bar{bottom:max(12px,env(safe-area-inset-bottom));padding-bottom:7px}
-  .home{padding-bottom:max(104px,calc(env(safe-area-inset-bottom) + 88px))}
+  /* Lift the home create controls clear of the iPhone rounded bottom corners. */
+  .create-bar{bottom:max(34px,calc(env(safe-area-inset-bottom) + 18px));padding-bottom:7px}
+  .home{padding-bottom:max(132px,calc(env(safe-area-inset-bottom) + 116px))}
 }
 
 
