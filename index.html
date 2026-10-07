@@ -677,6 +677,20 @@ button {
 .toast{z-index:130!important;}
 </style>
 
+
+<style>
+/* Final mobile home rule: overview determines the create-bar Y position; opened folders reuse it exactly. */
+@media (max-width:800px){
+  #homeView.home::after{content:none!important;display:none!important;}
+  #homeView .deck-library{flex:0 1 auto!important;}
+  #homeView.home-folder-open .deck-library{
+    flex:0 0 var(--library-anchor-height)!important;
+    height:var(--library-anchor-height)!important;
+    max-height:var(--library-anchor-height)!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -1823,14 +1837,31 @@ function folderCardFor(titleName,decks){
     ||cards.find(c=>c.title===titleName)
     ||cards.find(c=>decks.some(d=>(d.cards||[]).includes(c.id)));
 }
+function setLibraryFolderOpen(titleName){
+  const root=$("deckLibrary"),home=$("homeView");
+  if(!openLibraryTitle && root && home){
+    const h=root.getBoundingClientRect().height;
+    if(h>0) home.style.setProperty("--library-anchor-height",`${h}px`);
+  }
+  openLibraryTitle=titleName;
+  home?.classList.add("home-folder-open");
+  renderLibrary();
+}
+function leaveLibraryFolder(){
+  openLibraryTitle=null;
+  $("homeView")?.classList.remove("home-folder-open");
+  renderLibrary();
+}
 function renderLibrary(){
-  const root=$("deckLibrary"),items=getDecks().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));root.innerHTML="";
+  const root=$("deckLibrary"),items=getDecks().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  if(!openLibraryTitle) $("homeView")?.classList.remove("home-folder-open");
+  root.innerHTML="";
   if(!items.length){openLibraryTitle=null;root.innerHTML='<div class="home-empty">まだデッキがありません。<br>下の「デッキ作成」から作成できます。</div>';return}
   if(openLibraryTitle){
     const group=items.filter(d=>d.title===openLibraryTitle);
     if(!group.length){openLibraryTitle=null;renderLibrary();return}
     const bar=document.createElement("div");bar.className="library-toolbar";
-    const back=document.createElement("button");back.type="button";back.className="library-back";back.textContent="← タイトル一覧";back.onclick=()=>{openLibraryTitle=null;renderLibrary()};
+    const back=document.createElement("button");back.type="button";back.className="library-back";back.textContent="← タイトル一覧";back.onclick=leaveLibraryFolder;
     const heading=document.createElement("div");heading.className="library-folder-title";heading.textContent=openLibraryTitle;
     bar.append(back,heading);root.appendChild(bar);
     for(const d of group){
@@ -1857,7 +1888,7 @@ function renderLibrary(){
     const info=document.createElement("div");info.className="title-folder-info";
     const meta=document.createElement("div");meta.className="title-folder-meta";meta.innerHTML=`<div class="title-folder-count">${decks.length}デッキ</div>`;
     const edit=document.createElement("button");edit.type="button";edit.className="title-folder-edit";edit.textContent="画像変更";edit.onclick=e=>{e.stopPropagation();openFolderCoverPicker(titleName)};
-    art.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};titleOverlay.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};meta.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};
+    art.onclick=()=>setLibraryFolderOpen(titleName);titleOverlay.onclick=()=>setLibraryFolderOpen(titleName);meta.onclick=()=>setLibraryFolderOpen(titleName);
     info.append(meta,edit);wrap.append(art,info);root.appendChild(wrap);
   }
 }
