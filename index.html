@@ -1903,6 +1903,25 @@ function renderLibrary(){
     art.onclick=()=>setLibraryFolderOpen(titleName);titleOverlay.onclick=()=>setLibraryFolderOpen(titleName);meta.onclick=()=>setLibraryFolderOpen(titleName);
     info.append(meta,edit);wrap.append(art,info);root.appendChild(wrap);
   }
+  // Mobile home: the create controls are anchored immediately below the 5th folder row.
+  // A 6th+ row stays inside the library scroller instead of pushing the bottom UI downward.
+  if(window.matchMedia("(max-width:800px)").matches){
+    requestAnimationFrame(()=>{
+      if(openLibraryTitle) return;
+      const folders=[...root.querySelectorAll(":scope > .title-folder")];
+      root.style.removeProperty("height");
+      root.style.removeProperty("max-height");
+      if(folders.length>15){
+        const rr=root.getBoundingClientRect();
+        const fifthRowLast=folders[14].getBoundingClientRect();
+        const h=Math.ceil(fifthRowLast.bottom-rr.top+10);
+        root.style.height=`${h}px`;
+        root.style.maxHeight=`${h}px`;
+        root.style.overflowY="auto";
+        $("homeView")?.style.setProperty("--library-anchor-height",`${h}px`);
+      }
+    });
+  }
 }
 let folderPickerSort={mode:"energy",dir:1};
 function openFolderCoverPicker(titleName){
