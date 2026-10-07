@@ -645,7 +645,11 @@ button {
 /* ===== Mobile home/folder layout: lock header + create controls, scroll only library content ===== */
 @media (max-width:800px){
   body:not(.editor-open){height:100dvh;overflow:hidden!important;}
-  #homeView.home{
+  /* Only force the home flex layout while the home view is actually visible.
+     Previously #homeView.home {display:flex!important} overrode .view-hidden,
+     so editor/deck-list navigation succeeded internally but the home screen stayed on top. */
+  #homeView.home.view-hidden{display:none!important;}
+  #homeView.home:not(.view-hidden){
     height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
     display:flex!important;flex-direction:column!important;overflow:hidden!important;
     padding-bottom:0!important;
@@ -689,6 +693,14 @@ button {
     max-height:var(--library-anchor-height)!important;
     overflow-y:auto!important;overflow-x:hidden!important;
   }
+}
+</style>
+
+<style>
+/* Navigation visibility hard fix: view-hidden must always win over mobile home layout. */
+#homeView.view-hidden,#editorView.view-hidden{display:none!important;}
+@media (max-width:800px){
+  body:not(.editor-open) #homeView.home.view-hidden{display:none!important;}
 }
 </style>
 </head>
