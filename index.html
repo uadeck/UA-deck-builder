@@ -1929,13 +1929,21 @@ function closeLibrary(){$("libraryBackdrop").classList.remove("show");selectedLi
 $("closeLibraryModal").onclick=closeLibrary;$("libraryBackdrop").addEventListener("click",e=>{if(e.target===$("libraryBackdrop"))closeLibrary()});
 $("closeCoverModal").onclick=()=>$("coverBackdrop").classList.remove("show");
 $("coverBackdrop").addEventListener("click",e=>{if(e.target===$("coverBackdrop"))$("coverBackdrop").classList.remove("show")});
-$("libraryEditBtn").onclick=()=>{const id=selectedLibraryDeckId;closeLibrary();if(loadDeck(id))showEditor()};
+$("libraryEditBtn").onclick=()=>{
+  const id=selectedLibraryDeckId;
+  if(!id)return;
+  if(!loadDeck(id))return;
+  $("libraryBackdrop").classList.remove("show");
+  selectedLibraryDeckId=null;
+  showEditor();
+};
 $("libraryDeleteBtn").onclick=()=>{const id=selectedLibraryDeckId,d=getDeckRecord(id);if(!d)return;if(confirm(`「${d.name}」を削除しますか？`)){setDecks(getDecks().filter(x=>x.id!==id));closeLibrary();renderLibrary();toast("デッキを削除しました")}};
 $("libraryChangeCoverBtn").onclick=()=>{const id=selectedLibraryDeckId;if(!loadDeck(id))return;closeLibrary();openCoverPicker(()=>{showHome()})};
 function showDeckListView(id){
   const d=getDeckRecord(id);if(!d)return;
   deckLibraryScrollY=window.scrollY||window.pageYOffset||0;
-  closeLibrary();
+  $("libraryBackdrop").classList.remove("show");
+  selectedLibraryDeckId=null;
 
   $("deckListName").textContent=d.name||"名称未設定";
   $("deckListTitle").textContent=d.title||title;
