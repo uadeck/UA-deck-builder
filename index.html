@@ -640,6 +640,43 @@ button {
   }
 }
 </style>
+
+<style>
+/* ===== Mobile home/folder layout: lock header + create controls, scroll only library content ===== */
+@media (max-width:800px){
+  body:not(.editor-open){height:100dvh;overflow:hidden!important;}
+  #homeView.home{
+    height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
+    display:flex!important;flex-direction:column!important;overflow:hidden!important;
+    padding-bottom:0!important;
+  }
+  #homeView .home-header{
+    flex:0 0 auto!important;position:relative!important;z-index:30!important;
+  }
+  #homeView .deck-library{
+    flex:1 1 auto!important;min-height:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;
+    align-content:start!important;grid-auto-rows:max-content!important;
+    padding-bottom:10px!important;
+  }
+  #homeView .create-bar{
+    flex:0 0 auto!important;position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;
+    transform:none!important;width:100%!important;max-width:none!important;margin:0!important;
+    z-index:30!important;background:#15171b!important;
+    padding-top:8px!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important;
+  }
+  /* Keep the create controls at the same vertical position as the title-folder screen. */
+  #homeView.home::after{
+    content:""!important;display:block!important;flex:0 0 max(150px,calc(env(safe-area-inset-bottom) + 128px))!important;
+    width:100%!important;background:#15171b!important;pointer-events:none!important;
+  }
+}
+/* Modals must always sit above the fixed home controls. */
+.modal-backdrop{z-index:100!important;}
+.toast{z-index:130!important;}
+</style>
+
 </head>
 <body>
 
