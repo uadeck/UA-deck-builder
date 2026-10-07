@@ -436,8 +436,8 @@ button,input,select{touch-action:manipulation}
   body.editor-open{height:100dvh;overflow:hidden}
   body.editor-open #editorView.app{height:100dvh;max-height:100dvh;overflow:hidden}
   /* Lift the home create controls clear of the iPhone rounded bottom corners. */
-  .create-bar{bottom:max(118px,calc(env(safe-area-inset-bottom) + 100px));padding-bottom:7px}
-  .home{padding-bottom:max(216px,calc(env(safe-area-inset-bottom) + 198px))}
+  .create-bar{bottom:max(74px,calc(env(safe-area-inset-bottom) + 56px));padding-bottom:7px}
+  .home{padding-bottom:max(172px,calc(env(safe-area-inset-bottom) + 154px))}
 }
 
 
@@ -548,6 +548,68 @@ button {
   #deckListTitle{display:block!important;max-width:none!important;text-align:right!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.18!important;overflow-wrap:anywhere!important;}
 }
 </style>
+
+<style>
+@media (max-width:800px){
+  body:not(.editor-open){height:100dvh;overflow:hidden}
+  #homeView.home{
+    box-sizing:border-box;height:100dvh;min-height:100dvh;max-height:100dvh;
+    overflow:hidden;display:flex;flex-direction:column;padding-bottom:0!important
+  }
+  #homeView .home-header{
+    flex:0 0 auto;position:relative;z-index:30;background:#15171b
+  }
+  #homeView .deck-library{
+    flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-bottom:14px
+  }
+  #homeView .create-bar{
+    position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;
+    flex:0 0 auto;z-index:30;box-sizing:border-box;width:100%;margin:0;
+    padding-top:8px;padding-bottom:max(14px,env(safe-area-inset-bottom))!important;
+    background:#15171b
+  }
+}
+</style>
+
+
+<style>
+/* Folder title overlays the artwork; count/edit stay below. */
+.title-folder-art .title-folder-name{
+  position:absolute;
+  z-index:4;
+  left:8px;
+  right:8px;
+  bottom:7px;
+  color:#fff;
+  font-weight:900;
+  font-size:clamp(11px,1.35vw,15px);
+  line-height:1.12;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  text-shadow:
+    0 2px 3px #000,
+    0 0 4px #000,
+    1px 1px 1px #000,
+    -1px -1px 1px #000;
+  cursor:pointer;
+}
+.title-folder-info{
+  grid-template-columns:minmax(0,1fr) auto;
+}
+@media(max-width:600px){
+  .title-folder-art .title-folder-name{
+    left:6px;
+    right:6px;
+    bottom:6px;
+    font-size:clamp(10px,2.75vw,13px);
+    line-height:1.08;
+  }
+}
+</style>
+
 </head>
 <body>
 
@@ -1724,10 +1786,11 @@ function renderLibrary(){
     const c=folderCardFor(titleName,decks);
     if(c){const im=document.createElement("img");im.referrerPolicy="no-referrer";im.src=c.image;im.alt="";art.appendChild(im)}
     else art.innerHTML='<div class="library-empty">NO IMAGE</div>';
+    const titleOverlay=document.createElement("div");titleOverlay.className="title-folder-name";titleOverlay.textContent=titleName;art.appendChild(titleOverlay);
     const info=document.createElement("div");info.className="title-folder-info";
-    const meta=document.createElement("div");meta.className="title-folder-meta";meta.innerHTML=`<div class="title-folder-name"></div><div class="title-folder-count">${decks.length}デッキ</div>`;meta.querySelector(".title-folder-name").textContent=titleName;
+    const meta=document.createElement("div");meta.className="title-folder-meta";meta.innerHTML=`<div class="title-folder-count">${decks.length}デッキ</div>`;
     const edit=document.createElement("button");edit.type="button";edit.className="title-folder-edit";edit.textContent="画像変更";edit.onclick=e=>{e.stopPropagation();openFolderCoverPicker(titleName)};
-    art.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};meta.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};
+    art.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};titleOverlay.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};meta.onclick=()=>{openLibraryTitle=titleName;renderLibrary()};
     info.append(meta,edit);wrap.append(art,info);root.appendChild(wrap);
   }
 }
