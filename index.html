@@ -1921,21 +1921,27 @@ $("folderSortType").onclick=()=>{if(folderPickerSort.mode==="type")folderPickerS
 $("closeFolderCoverModal").onclick=()=>{$("folderCoverBackdrop").classList.remove("show");renderLibrary()};
 $("folderCoverBackdrop").addEventListener("click",e=>{if(e.target===$("folderCoverBackdrop")){e.currentTarget.classList.remove("show");renderLibrary()}});
 function openLibraryDeck(id){
-  const d=getDeckRecord(id);if(!d)return;selectedLibraryDeckId=id;
+  const d=getDeckRecord(id);if(!d)return;selectedLibraryDeckId=id;$("libraryBackdrop").dataset.deckId=id;
   const c=cards.find(x=>x.id===d.coverId)||cards.find(x=>x.id===(d.cards||[])[0]);
   $("libraryCoverImg").referrerPolicy="no-referrer";$("libraryCoverImg").src=c?c.image:"";$("libraryDeckName").textContent=d.name||"名称未設定";$("libraryBackdrop").classList.add("show")
 }
-function closeLibrary(){$("libraryBackdrop").classList.remove("show");selectedLibraryDeckId=null}
+function closeLibrary(){$("libraryBackdrop").classList.remove("show");selectedLibraryDeckId=null;delete $("libraryBackdrop").dataset.deckId}
 $("closeLibraryModal").onclick=closeLibrary;$("libraryBackdrop").addEventListener("click",e=>{if(e.target===$("libraryBackdrop"))closeLibrary()});
 $("closeCoverModal").onclick=()=>$("coverBackdrop").classList.remove("show");
 $("coverBackdrop").addEventListener("click",e=>{if(e.target===$("coverBackdrop"))$("coverBackdrop").classList.remove("show")});
-$("libraryEditBtn").onclick=()=>{
-  const id=selectedLibraryDeckId;
-  if(!id)return;
-  if(!loadDeck(id))return;
+$("libraryEditBtn").onclick=(e)=>{
+  e.preventDefault();e.stopPropagation();
+  const id=$("libraryBackdrop").dataset.deckId||selectedLibraryDeckId;
+  if(!id||!loadDeck(id)){toast("デッキを読み込めませんでした");return;}
   $("libraryBackdrop").classList.remove("show");
-  selectedLibraryDeckId=null;
-  showEditor();
+  selectedLibraryDeckId=null;delete $("libraryBackdrop").dataset.deckId;
+  // Force the editor to be the only visible main view.
+  document.body.classList.add("editor-open");
+  $("homeView").classList.add("view-hidden");
+  $("editorView").classList.remove("view-hidden");
+  $("homeView").style.display="";$("editorView").style.display="";
+  $("deckListView").style.display="none";
+  persistEditorSession();render();
 };
 $("libraryDeleteBtn").onclick=()=>{const id=selectedLibraryDeckId,d=getDeckRecord(id);if(!d)return;if(confirm(`「${d.name}」を削除しますか？`)){setDecks(getDecks().filter(x=>x.id!==id));closeLibrary();renderLibrary();toast("デッキを削除しました")}};
 $("libraryChangeCoverBtn").onclick=()=>{const id=selectedLibraryDeckId;if(!loadDeck(id))return;closeLibrary();openCoverPicker(()=>{showHome()})};
@@ -1968,9 +1974,12 @@ function showDeckListView(id){
     grid.appendChild(empty);
   }
 
+  document.body.classList.remove("editor-open");
+  $("homeView").classList.add("view-hidden");
+  $("editorView").classList.add("view-hidden");
   $("homeView").style.display="none";
   $("editorView").style.display="none";
-  $("deckListView").style.display="block";
+  $("deckListView").style.setProperty("display","block","important");
   window.scrollTo({top:0,behavior:"instant"});
 }
 $("closeDeckListView").onclick=()=>{
@@ -1980,7 +1989,12 @@ $("closeDeckListView").onclick=()=>{
     window.scrollTo({top:deckLibraryScrollY,left:0,behavior:"instant"});
   });
 };
-$("libraryExportBtn").onclick=()=>{if(selectedLibraryDeckId)showDeckListView(selectedLibraryDeckId)};
+$("libraryExportBtn").onclick=(e)=>{
+  e.preventDefault();e.stopPropagation();
+  const id=$("libraryBackdrop").dataset.deckId||selectedLibraryDeckId;
+  if(!id){toast("デッキを読み込めませんでした");return;}
+  showDeckListView(id);
+};
 $("createDeckBtn").onclick=newDeck;
 $("loginBtn").onclick=()=>toast("GoogleログインはFirebase接続時に有効化します");
 console.info("JJK dataset coverage",datasetCoverage("呪術廻戦"));
