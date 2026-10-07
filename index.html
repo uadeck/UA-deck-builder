@@ -560,7 +560,7 @@ button {
     flex:0 0 auto;position:relative;z-index:30;background:#15171b
   }
   #homeView .deck-library{
-    flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    flex:0 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
     align-content:start;grid-auto-rows:max-content;
     padding-bottom:14px
@@ -615,15 +615,11 @@ button {
 
 
 <style>
-/* Mobile home: keep fixed top/bottom controls, plus a clean blank band below create controls. */
+/* Mobile home: title/create controls sit immediately below the visible folder rows. */
 @media (max-width:800px){
   #homeView.home::after{
-    content:"";
-    display:block;
-    flex:0 0 max(150px,calc(env(safe-area-inset-bottom) + 128px));
-    width:100%;
-    background:#15171b;
-    pointer-events:none;
+    content:none!important;
+    display:none!important;
   }
   #homeView .create-bar{
     flex:0 0 auto!important;
@@ -638,6 +634,7 @@ button {
     align-content:start!important;
     grid-auto-rows:max-content!important;
     min-height:0!important;
+    flex:0 1 auto!important;
     overflow-y:auto!important;
     overflow-x:hidden!important;
   }
