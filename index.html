@@ -854,6 +854,7 @@ button {
   <div style="max-width:1200px;margin:0 auto">
     <div class="decklist-view-controls" style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
       <button id="closeDeckListView" style="padding:10px 18px">← 一覧へ戻る</button>
+      <button id="saveDeckListPng" type="button" style="padding:10px 14px;background:#2563eb;color:white;border:0;border-radius:6px">PNG画像出力</button>
       <span style="color:#aeb3bc;font-size:13px">カード画像をそのまま表示する出力用レイアウト</span>
     </div>
     <div id="deckListCaptureArea" style="background:#17181b;padding:14px 18px 18px;box-sizing:border-box;max-width:1100px;margin:0 auto">
@@ -1985,6 +1986,7 @@ function showDeckListView(id){
   $("deckListName").textContent=d.name||"名称未設定";
   $("deckListTitle").textContent=d.title||title;
 
+  $("deckListView").dataset.deckId=id;
   const grid=$("deckListGrid");
   grid.innerHTML="";
   for(let i=0;i<Math.min(50,d.cards.length);i++){
@@ -2013,6 +2015,48 @@ function showDeckListView(id){
   $("deckListView").style.setProperty("display","block","important");
   window.scrollTo({top:0,behavior:"instant"});
 }
+// Export the saved deck independently of the screen's CSS pixel dimensions.
+async function exportDeckListPng(){
+  const btn=$("saveDeckListPng"), id=$("deckListView").dataset.deckId;
+  const d=getDeckRecord(id);if(!d){toast("デッキを読み込めませんでした");return;}
+  btn.disabled=true;btn.textContent="画像を生成中…";
+  try{
+    const W=3840,H=2160, pad=56, head=160, cols=10, rows=5;
+    const cw=(W-pad*2)/cols, ch=(H-head-pad)/rows;
+    const canvas=document.createElement("canvas");canvas.width=W;canvas.height=H;
+    const ctx=canvas.getContext("2d");ctx.fillStyle="#17181b";ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#fff";ctx.font="bold 64px sans-serif";
+    const name=d.name||"名称未設定";
+    let display=name;while(ctx.measureText(display).width>W*0.68&&display.length>1)display=display.slice(0,-2)+"…";
+    ctx.fillText(display,pad,95);
+    ctx.fillStyle="#b7bac2";ctx.font="36px sans-serif";
+    ctx.textAlign="right";ctx.fillText((d.title||"")+"   "+Math.min(50,d.cards.length)+"/50",W-pad,94);ctx.textAlign="left";
+    const errors=[];
+    const load=(url)=>new Promise((resolve,reject)=>{
+      const im=new Image();im.crossOrigin="anonymous";im.referrerPolicy="no-referrer";
+      im.onload=()=>resolve(im);im.onerror=()=>reject(new Error("画像取得不可"));im.src=url;
+    });
+    for(let i=0;i<50;i++){
+      const x=pad+(i%cols)*cw,y=head+Math.floor(i/cols)*ch;
+      ctx.fillStyle="#202226";ctx.fillRect(x,y,cw,ch);
+      if(i>=d.cards.length)continue;
+      const c=cards.find(v=>v.id===d.cards[i]);if(!c){errors.push(i+1);continue;}
+      let im;
+      try{im=await load(c.image);}catch(e){errors.push(i+1);continue;}
+      const scale=Math.max(cw/im.naturalWidth,ch/im.naturalHeight);
+      const sw=cw/scale,sh=ch/scale,sx=(im.naturalWidth-sw)/2,sy=(im.naturalHeight-sh)/2;
+      ctx.drawImage(im,sx,sy,sw,sh,x,y,cw,ch);
+    }
+    if(errors.length)throw new Error("カード画像を取得できませんでした（位置: "+errors.slice(0,8).join(", ")+(errors.length>8?" ほか":"")+"）。公式画像の外部利用制限の可能性があります。");
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("画像保存がブラウザに拒否されました")),"image/png"));
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=(name.replace(/[\\/:*?"<>|]/g,"_")||"deck")+"_4K.png";
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    toast("4K PNGを出力しました。iPhoneではダウンロードから保存できます");
+  }catch(e){alert("PNG出力できませんでした。\n"+e.message+"\n※画像が読み込めない場合、ブラウザの制限により直接出力できません。");}
+  finally{btn.disabled=false;btn.textContent="PNG画像出力";}
+}
+$("saveDeckListPng").onclick=exportDeckListPng;
 $("closeDeckListView").onclick=()=>{
   $("deckListView").style.display="none";
   showHome();
