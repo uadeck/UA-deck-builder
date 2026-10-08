@@ -2021,16 +2021,16 @@ async function exportDeckListPng(){
   const d=getDeckRecord(id);if(!d){toast("デッキを読み込めませんでした");return;}
   btn.disabled=true;btn.textContent="画像を生成中…";
   try{
-    const W=3840,H=2160, pad=56, head=160, cols=10, rows=5;
+    const W=3840,H=2850, pad=20, head=118, cols=10, rows=5;
     const cw=(W-pad*2)/cols, ch=(H-head-pad)/rows;
     const canvas=document.createElement("canvas");canvas.width=W;canvas.height=H;
     const ctx=canvas.getContext("2d");ctx.fillStyle="#17181b";ctx.fillRect(0,0,W,H);
     ctx.fillStyle="#fff";ctx.font="bold 64px sans-serif";
     const name=d.name||"名称未設定";
     let display=name;while(ctx.measureText(display).width>W*0.68&&display.length>1)display=display.slice(0,-2)+"…";
-    ctx.fillText(display,pad,95);
+    ctx.fillText(display,pad,80);
     ctx.fillStyle="#b7bac2";ctx.font="36px sans-serif";
-    ctx.textAlign="right";ctx.fillText((d.title||"")+"   "+Math.min(50,d.cards.length)+"/50",W-pad,94);ctx.textAlign="left";
+    ctx.textAlign="right";ctx.fillText((d.title||"")+"   "+Math.min(50,d.cards.length)+"/50",W-pad,80);ctx.textAlign="left";
     const errors=[];
     // Normal card display is allowed to load cross-origin images without CORS,
     // but Canvas export requires CORS-enabled image bytes. Try the official URL
