@@ -2032,10 +2032,26 @@ async function exportDeckListPng(){
     ctx.fillStyle="#b7bac2";ctx.font="36px sans-serif";
     ctx.textAlign="right";ctx.fillText((d.title||"")+"   "+Math.min(50,d.cards.length)+"/50",W-pad,94);ctx.textAlign="left";
     const errors=[];
-    const load=(url)=>new Promise((resolve,reject)=>{
+    // Normal card display is allowed to load cross-origin images without CORS,
+    // but Canvas export requires CORS-enabled image bytes. Try the official URL
+    // first, then a public-image caching endpoint for PNG export only.
+    const loadOne=(url)=>new Promise((resolve,reject)=>{
       const im=new Image();im.crossOrigin="anonymous";im.referrerPolicy="no-referrer";
-      im.onload=()=>resolve(im);im.onerror=()=>reject(new Error("画像取得不可"));im.src=url;
+      const timer=setTimeout(()=>{im.onload=im.onerror=null;reject(new Error("timeout"));},9000);
+      im.onload=()=>{clearTimeout(timer);resolve(im)};
+      im.onerror=()=>{clearTimeout(timer);reject(new Error("画像取得不可"))};
+      im.src=url;
     });
+    const load=async(url)=>{
+      if(!url)throw new Error("画像URLが空です");
+      try{return await loadOne(url)}catch(e){
+        // Only public official card-image URLs may use this external cache.
+        const u=new URL(url);
+        if(u.hostname!=="www.unionarena-tcg.com" || !u.pathname.startsWith("/jp/images/cardlist/card/"))throw e;
+        const proxy="https://images.weserv.nl/?url="+encodeURIComponent(url);
+        return await loadOne(proxy);
+      }
+    };
     for(let i=0;i<50;i++){
       const x=pad+(i%cols)*cw,y=head+Math.floor(i/cols)*ch;
       ctx.fillStyle="#202226";ctx.fillRect(x,y,cw,ch);
@@ -2043,17 +2059,18 @@ async function exportDeckListPng(){
       const c=cards.find(v=>v.id===d.cards[i]);if(!c){errors.push(i+1);continue;}
       let im;
       try{im=await load(c.image);}catch(e){errors.push(i+1);continue;}
-      const scale=Math.max(cw/im.naturalWidth,ch/im.naturalHeight);
-      const sw=cw/scale,sh=ch/scale,sx=(im.naturalWidth-sw)/2,sy=(im.naturalHeight-sh)/2;
-      ctx.drawImage(im,sx,sy,sw,sh,x,y,cw,ch);
+      // Keep the full card visible; do not crop its edges to fit the 16:9 page.
+      const scale=Math.min(cw/im.naturalWidth,ch/im.naturalHeight);
+      const dw=im.naturalWidth*scale,dh=im.naturalHeight*scale;
+      ctx.drawImage(im,x+(cw-dw)/2,y+(ch-dh)/2,dw,dh);
     }
-    if(errors.length)throw new Error("カード画像を取得できませんでした（位置: "+errors.slice(0,8).join(", ")+(errors.length>8?" ほか":"")+"）。公式画像の外部利用制限の可能性があります。");
+    if(errors.length)throw new Error("カード画像を取得できませんでした（位置: "+errors.slice(0,8).join(", ")+(errors.length>8?" ほか":"")+"）。公式画像と画像キャッシュの両方で取得できませんでした。");
     const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("画像保存がブラウザに拒否されました")),"image/png"));
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");a.href=url;a.download=(name.replace(/[\\/:*?"<>|]/g,"_")||"deck")+"_4K.png";
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
     toast("4K PNGを出力しました。iPhoneではダウンロードから保存できます");
-  }catch(e){alert("PNG出力できませんでした。\n"+e.message+"\n※画像が読み込めない場合、ブラウザの制限により直接出力できません。");}
+  }catch(e){alert("PNG出力できませんでした。\n"+e.message+"\n※公式画像のCORS制限に備えて公開画像キャッシュも試しますが、画像提供元やキャッシュ側の制限によって失敗する場合があります。");}
   finally{btn.disabled=false;btn.textContent="PNG画像出力";}
 }
 $("saveDeckListPng").onclick=exportDeckListPng;
